@@ -2,7 +2,10 @@ import dotenv from "dotenv";
 import path from "path";
 
 // Load environment variables FIRST before any other imports
-dotenv.config({ path: path.join(__dirname, "../.env.local") });
+// In production (Render), .env.local won't exist - it uses environment variables directly
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config({ path: path.join(__dirname, "../.env.local") });
+}
 
 import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
@@ -20,11 +23,24 @@ validateEnv();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// CORS configuration - more restrictive in production
+// CORS configuration - allow frontend URLs
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://synapse.vercel.app',
+  process.env.FRONTEND_URL,
+].filter(Boolean);
+
 const corsOptions = {
-  origin: process.env.NODE_ENV === 'production' 
-    ? process.env.FRONTEND_URL || 'https://synapse.vercel.app'
-    : 'http://localhost:3000',
+  origin: function (origin: string | undefined, callback: Function) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
 };
 
@@ -62,6 +78,21 @@ const upload = multer({
   },
 });
 
+
+// Root route
+app.get("/", (req, res) => {
+  res.json({ 
+    message: "Synapse Backend API", 
+    version: "1.0.0",
+    endpoints: {
+      health: "/health",
+      upload: "POST /api/upload",
+      chat: "POST /api/chat",
+      chatStream: "POST /api/chat/stream",
+      sendEmail: "POST /api/email/send"
+    }
+  });
+});
 
 app.post("/api/upload", upload.single("file"), handleUpload);
 app.post("/api/chat", handleChat);
