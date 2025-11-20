@@ -2,10 +2,14 @@ import { Request, Response } from "express";
 import { processPDF, processCSV } from "../services/ingestion.service";
 import { getUserFriendlyError } from "../utils/error-messages";
 import Document from "../models/Document";
+import connectDB from "../config/db";
 import fs from "fs";
 
 export async function handleUpload(req: Request, res: Response) {
   try {
+    // Connect to database FIRST
+    await connectDB();
+
     if (!req.file) {
       const error = getUserFriendlyError("NO_FILE");
       return res.status(400).json({ 
