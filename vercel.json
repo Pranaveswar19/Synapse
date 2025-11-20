@@ -1,12 +1,5 @@
 {
   "version": 2,
-  "name": "synapse",
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/next"
-    }
-  ],
   "env": {
     "MONGODB_URI": "@mongodb_uri",
     "OPENAI_API_KEY": "@openai_api_key",
@@ -14,12 +7,5 @@
     "SMTP_PORT": "@smtp_port",
     "SMTP_USER": "@smtp_user",
     "SMTP_PASS": "@smtp_pass"
-  },
-  "regions": ["iad1"],
-  "functions": {
-    "api/**/*.ts": {
-      "memory": 1024,
-      "maxDuration": 30
-    }
   }
 }
