@@ -94,15 +94,7 @@ app.get("/", (req, res) => {
   });
 });
 
-app.post("/api/upload", upload.single("file"), handleUpload);
-app.post("/api/chat", handleChat);
-app.post("/api/chat/stream", handleChatStream);
-app.post("/api/email/send", handleSendEmail);
-
-// NEW: Document management endpoints
-app.delete("/api/documents/old", handleClearOldDocuments); // Clear documents older than X hours
-app.delete("/api/documents/all", handleClearAllDocuments); // Clear ALL documents
-
+// Health check endpoint - MUST be before other routes
 app.get("/health", (req, res) => {
   res.json({ 
     status: "ok", 
@@ -111,6 +103,15 @@ app.get("/health", (req, res) => {
     version: '1.0.0'
   });
 });
+
+app.post("/api/upload", upload.single("file"), handleUpload);
+app.post("/api/chat", handleChat);
+app.post("/api/chat/stream", handleChatStream);
+app.post("/api/email/send", handleSendEmail);
+
+// NEW: Document management endpoints
+app.delete("/api/documents/old", handleClearOldDocuments); // Clear documents older than X hours
+app.delete("/api/documents/all", handleClearAllDocuments); // Clear ALL documents
 
 app.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
   console.error("Server error:", err);
