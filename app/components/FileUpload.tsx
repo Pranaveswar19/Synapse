@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSessionId } from '../hooks/useSessionId';
+import { API_BASE_URL } from '@/lib/config';
 
 interface ErrorState {
   message: string;
@@ -54,7 +55,7 @@ export default function FileUpload({ onUploadSuccess }: { onUploadSuccess: (data
     formData.append('sessionId', sessionId);
 
     try {
-      const res = await fetch('http://localhost:3001/api/upload', {
+      const res = await fetch(`${API_BASE_URL}/api/upload`, {
         method: 'POST',
         body: formData
       });

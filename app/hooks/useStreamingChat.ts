@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef } from "react";
 import { useSessionId } from "./useSessionId";
+import { API_BASE_URL } from "@/lib/config";
 
 export interface StreamingMessage {
   role: "user" | "assistant";
@@ -54,7 +55,7 @@ export function useStreamingChat() {
     setIsStreaming(true);
 
     try {
-      const response = await fetch("http://localhost:3001/api/chat/stream", {
+      const response = await fetch(`${API_BASE_URL}/api/chat/stream`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -227,7 +228,7 @@ export function useStreamingChat() {
 
   const sendEmail = useCallback(async (emailData: any) => {
     try {
-      const response = await fetch("http://localhost:3001/api/email/send", {
+      const response = await fetch(`${API_BASE_URL}/api/email/send`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(emailData),
