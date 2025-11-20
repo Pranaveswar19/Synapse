@@ -40,6 +40,10 @@ const AgentStateAnnotation = Annotation.Root({
     reducer: (x, y) => y ?? x,
     default: () => [],
   }),
+  sessionId: Annotation<string>({
+    reducer: (x, y) => y ?? x,
+    default: () => "",
+  }),
   shouldEmail: Annotation<boolean>({
     reducer: (x, y) => y ?? x,
     default: () => false,
@@ -130,8 +134,10 @@ async function retrieveData(state: AgentState): Promise<Partial<AgentState>> {
   await connectDB();
   const thinking = [...state.thinking, "Retrieving documents from database..."];
 
-  const documents = await Document.find().sort({ uploadDate: -1 }).limit(5);
-  thinking.push(`Found ${documents.length} documents`);
+  // Filter by sessionId to prevent memory bleeding between uploads
+  const query = state.sessionId ? { sessionId: state.sessionId } : {};
+  const documents = await Document.find(query).sort({ uploadDate: -1 }).limit(5);
+  thinking.push(`Found ${documents.length} documents for this session`);
 
   return { thinking, documents };
 }
@@ -483,12 +489,14 @@ const app = workflow.compile();
 
 export async function runAgent(
   userMessage: string,
-  conversationHistory: any[] = []
+  conversationHistory: any[] = [],
+  sessionId?: string
 ) {
   const initialState: AgentState = {
     messages: [...conversationHistory, new HumanMessage(userMessage)],
     thinking: [],
     documents: [],
+    sessionId: sessionId || "",
     shouldEmail: false,
     plan: [],
     retrievedData: {},

@@ -27,7 +27,7 @@ export async function handleChat(req: Request, res: Response) {
       content: msg.content,
     }));
 
-    const agentResult = await runAgent(message, conversationHistory);
+    const agentResult = await runAgent(message, conversationHistory, sessionId);
 
     chat.messages.push({
       role: "user",

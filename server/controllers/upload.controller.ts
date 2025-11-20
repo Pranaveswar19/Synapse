@@ -36,6 +36,12 @@ export async function handleUpload(req: Request, res: Response) {
     const fileExists = fs.existsSync(file.path);
     console.log("  - File exists?", fileExists);
 
+    // IMPORTANT: Delete old documents from this session before processing new one
+    // This prevents memory bleeding between uploads
+    console.log("🧹 Clearing old documents from session:", sessionId);
+    const deleteResult = await Document.deleteMany({ sessionId });
+    console.log(`   Deleted ${deleteResult.deletedCount} old document(s)`);
+
     let document;
 
     if (file.mimetype === "application/pdf") {
