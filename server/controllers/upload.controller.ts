@@ -38,9 +38,14 @@ export async function handleUpload(req: Request, res: Response) {
 
     // IMPORTANT: Delete old documents from this session before processing new one
     // This prevents memory bleeding between uploads
-    console.log("🧹 Clearing old documents from session:", sessionId);
-    const deleteResult = await Document.deleteMany({ sessionId });
-    console.log(`   Deleted ${deleteResult.deletedCount} old document(s)`);
+    try {
+      console.log("🧹 Clearing old documents from session:", sessionId);
+      const deleteResult = await Document.deleteMany({ sessionId });
+      console.log(`   Deleted ${deleteResult.deletedCount} old document(s)`);
+    } catch (deleteError) {
+      console.error("⚠️  Warning: Could not delete old documents:", deleteError);
+      // Continue anyway - don't fail the upload if deletion fails
+    }
 
     let document;
 

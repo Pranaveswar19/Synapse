@@ -70,6 +70,7 @@ interface AgentState {
   messages: any[];
   thinking: string[];
   documents: any[];
+  sessionId?: string;
   shouldEmail: boolean;
   emailData?: {
     name: string;
